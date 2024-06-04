@@ -16,7 +16,7 @@ public class PrivilegeDTO implements Privilege {
   private Name name;
 
   @JsonProperty("condition")
-  private Condition condition;
+  private AccessType condition;
 
   /** Default constructor for Jackson deserialization. */
   protected PrivilegeDTO() {}
@@ -27,7 +27,7 @@ public class PrivilegeDTO implements Privilege {
    * @param name The name of the Privilege DTO.
    * @param condition The condition of the Privilege DTO.
    */
-  protected PrivilegeDTO(Name name, Condition condition) {
+  protected PrivilegeDTO(Name name, AccessType condition) {
     this.name = name;
     this.condition = condition;
   }
@@ -39,7 +39,7 @@ public class PrivilegeDTO implements Privilege {
 
   @Override
   public String simpleString() {
-    if (Condition.ALLOW.equals(condition)) {
+    if (AccessType.ALLOW.equals(condition)) {
       return Privileges.allow(name).simpleString();
     } else {
       return Privileges.deny(name).simpleString();
@@ -47,7 +47,7 @@ public class PrivilegeDTO implements Privilege {
   }
 
   @Override
-  public Condition condition() {
+  public AccessType accessType() {
     return condition;
   }
 
@@ -60,7 +60,7 @@ public class PrivilegeDTO implements Privilege {
   public static class Builder {
 
     private Name name;
-    private Condition condition;
+    private AccessType condition;
 
     /**
      * Sets the name of the privilege.
@@ -79,7 +79,7 @@ public class PrivilegeDTO implements Privilege {
      * @param condition The condition of the privilege.
      * @return The builder instance.
      */
-    public Builder withCondition(Condition condition) {
+    public Builder withCondition(AccessType condition) {
       this.condition = condition;
       return this;
     }

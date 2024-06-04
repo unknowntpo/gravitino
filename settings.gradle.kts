@@ -32,6 +32,8 @@ include(
 )
 include("trino-connector")
 include("spark-connector:spark-common")
+include("authorizations:authorization-ranger")
+
 // kyuubi hive connector doesn't support 2.13 for Spark3.3
 if (scalaVersion == "2.12") {
   include("spark-connector:spark-3.3", "spark-connector:spark-runtime-3.3")

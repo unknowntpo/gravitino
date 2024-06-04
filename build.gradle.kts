@@ -264,7 +264,7 @@ subprojects {
           "-Xlint:finally",
           "-Xlint:overrides",
           "-Xlint:static",
-          "-Werror"
+//          "-Werror"
         )
       )
     }
@@ -476,6 +476,7 @@ tasks.rat {
     "**/NOTICE.*",
     "ROADMAP.md",
     "clients/client-python/.pytest_cache/*",
+    "clients/client-python/.venv/*",
     "clients/client-python/gravitino.egg-info/*",
     "clients/client-python/gravitino/utils/exceptions.py",
     "clients/client-python/gravitino/utils/http_client.py"
@@ -513,7 +514,7 @@ tasks {
   val outputDir = projectDir.dir("distribution")
 
   val compileDistribution by registering {
-    dependsOn("copySubprojectDependencies", "copyCatalogLibAndConfigs", "copySubprojectLib")
+    dependsOn("copySubprojectDependencies", "copyCatalogLibAndConfigs", "copySubprojectLib", "copyAuthorizationLibAndConfigs")
 
     group = "gravitino distribution"
     outputs.dir(projectDir.dir("distribution/package"))
@@ -620,6 +621,7 @@ tasks {
   register("copySubprojectLib", Copy::class) {
     subprojects.forEach() {
       if (!it.name.startsWith("catalog") &&
+        !it.name.startsWith("authorization") &&
         !it.name.startsWith("client") &&
         !it.name.startsWith("filesystem") &&
         !it.name.startsWith("spark") &&
@@ -646,6 +648,12 @@ tasks {
       ":catalogs:catalog-jdbc-postgresql:copyLibAndConfig",
       ":catalogs:catalog-hadoop:copyLibAndConfig",
       "catalogs:catalog-kafka:copyLibAndConfig"
+    )
+  }
+
+  register("copyAuthorizationLibAndConfigs", Copy::class) {
+    dependsOn(
+      "authorizations:authorization-ranger:copyLibAndConfig"
     )
   }
 

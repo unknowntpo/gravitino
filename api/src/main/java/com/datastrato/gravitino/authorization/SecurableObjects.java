@@ -5,9 +5,12 @@
 package com.datastrato.gravitino.authorization;
 
 import com.datastrato.gravitino.MetadataObject;
+import com.datastrato.gravitino.Namespace;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -16,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 /** The helper class for {@link SecurableObject}. */
 public class SecurableObjects {
 
-  private static final Splitter DOT = Splitter.on('.');
+  public static final Splitter DOT = Splitter.on('.');
 
   /**
    * Create the metalake {@link SecurableObject} with the given metalake name.
@@ -69,6 +72,10 @@ public class SecurableObjects {
     List<String> names = Lists.newArrayList(DOT.splitToList(schema.fullName()));
     names.add(table);
     return of(SecurableObject.Type.TABLE, names, privileges);
+  }
+
+  public static SecurableObject ofNamespace(MetadataObject.Type type, Namespace namespace, List<Privilege> privileges) {
+    return of(type, Arrays.asList(namespace.levels()), privileges);
   }
 
   /**
@@ -241,9 +248,9 @@ public class SecurableObjects {
       throw new IllegalArgumentException("Cannot create a securable object with no type");
     }
 
-    if (names.size() > 3) {
+    if (names.size() > 4) {
       throw new IllegalArgumentException(
-          "Cannot create a securable object with the name length which is greater than 3");
+          "Cannot create a securable object with the name length which is greater than 4");
     }
 
     if (names.size() == 1
@@ -263,6 +270,12 @@ public class SecurableObjects {
         && type != MetadataObject.Type.TOPIC) {
       throw new IllegalArgumentException(
           "If the length of names is 3, it must be FILESET, TABLE or TOPIC");
+    }
+
+    if (names.size() == 4
+            && type != MetadataObject.Type.COLUMN) {
+      throw new IllegalArgumentException(
+              "If the length of names is 4, it must be COLUMN");
     }
 
     for (String name : names) {

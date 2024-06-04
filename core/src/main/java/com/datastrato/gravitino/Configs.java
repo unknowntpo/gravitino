@@ -159,6 +159,13 @@ public class Configs {
           .booleanConf()
           .createWithDefault(true);
 
+  public static final ConfigEntry<Boolean> AUTHORIZATION_LOAD_ISOLATED =
+          new ConfigBuilder("gravitino.authorization.classloader.isolated")
+                  .doc("Whether to load the authorization in an isolated classloader")
+                  .version(ConfigConstants.VERSION_0_6_0)
+                  .booleanConf()
+                  .createWithDefault(true);
+
   public static final ConfigEntry<String> AUTHENTICATOR =
       new ConfigBuilder("gravitino.authenticator")
           .doc("The authenticator which Gravitino uses")
