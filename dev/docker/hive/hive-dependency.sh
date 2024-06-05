@@ -8,8 +8,8 @@ hive_dir="$(dirname "${BASH_SOURCE-$0}")"
 hive_dir="$(cd "${hive_dir}">/dev/null; pwd)"
 
 # Environment variables definition
-HADOOP_VERSION="2.7.3"
-HIVE_VERSION="2.3.9"
+HADOOP_VERSION=${HADOOP_VERSION:-"2.7.3"}
+HIVE_VERSION=${HIVE_VERSION:-"2.3.9"}
 MYSQL_JDBC_DRIVER_VERSION="8.0.15"
 
 HADOOP_PACKAGE_NAME="hadoop-${HADOOP_VERSION}.tar.gz" # Must export this variable for Dockerfile
