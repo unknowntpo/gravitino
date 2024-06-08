@@ -33,19 +33,13 @@
   </property>
 
   <property>
-    <name>hive.execution.engine</name>
-    <value>mr</value>
-    <description>Choose execution engine. Available choices are: mr, tez, spark.</description>
-  </property>
-
-  <property>
     <name>javax.jdo.option.ConnectionDriverName</name>
     <value>com.mysql.jdbc.Driver</value>
   </property>
 
   <property>
     <name>hive.metastore.warehouse.dir</name>
-    <value>hdfs://localhost:9000/user/hive/warehouse</value>
+    <value>hdfs://HOST_NAME:9000/user/hive/warehouse</value>
     <description>location of default database for the warehouse</description>
   </property>
 </configuration>
