@@ -8,9 +8,7 @@
 if [[ -n "${RANGER_HIVE_REPOSITORY_NAME}" && -n "${RANGER_SERVER_URL}" ]]; then
   # If Hive enable Ranger plugin need requires zookeeper
   echo "Starting zookeeper..."
-  #sed -i -r 's|#(log4j.appender.ROLLINGFILE.MaxBackupIndex.*)|\1|g' ${ZK_HOME}/conf/log4j.properties
   mv ${ZK_HOME}/conf/zoo_sample.cfg ${ZK_HOME}/conf/zoo.cfg
-  #sed -i -r 's|#autopurge|autopurge|g' ${ZK_HOME}/conf/zoo.cfg
   sed -i "s|/tmp/zookeeper|${ZK_HOME}/data|g" ${ZK_HOME}/conf/zoo.cfg
   ${ZK_HOME}/bin/zkServer.sh start-foreground > /dev/null 2>&1 &
 
@@ -23,6 +21,27 @@ if [[ -n "${RANGER_HIVE_REPOSITORY_NAME}" && -n "${RANGER_SERVER_URL}" ]]; then
 
   # Reduce poll policy interval in the ranger plugin configuration
   sed -i '/<name>ranger.plugin.hive.policy.pollIntervalMs<\/name>/{n;s/<value>30000<\/value>/<value>1000<\/value>/}' ${HIVE_HOME}/conf/ranger-hive-security.xml
+
+  # Enable audit log in hive
+  cp ${HIVE_HOME}/conf/hive-log4j2.properties.template ${HIVE_HOME}/conf/hive-log4j2.properties
+  sed -i "s/appenders = console, DRFA/appenders = console, DRFA, RANGERAUDIT/g" ${HIVE_HOME}/conf/hive-log4j2.properties
+  sed -i "s/loggers = NIOServerCnxn, ClientCnxnSocketNIO, DataNucleus, Datastore, JPOX, PerfLogger, AmazonAws, ApacheHttp/loggers = NIOServerCnxn, ClientCnxnSocketNIO, DataNucleus, Datastore, JPOX, PerfLogger, AmazonAws, ApacheHttp, Ranger/g" ${HIVE_HOME}/conf/hive-log4j2.properties
+
+  # Enable Ranger audit log in hive
+cat <<'EOF' >> ${HIVE_HOME}/conf/hive-log4j2.properties
+
+# RANGERAUDIT appender
+logger.Ranger.name = xaaudit
+logger.Ranger.level = INFO
+logger.Ranger.appenderRefs = RANGERAUDIT
+logger.Ranger.appenderRef.RANGERAUDIT.ref = RANGERAUDIT
+appender.RANGERAUDIT.type=file
+appender.RANGERAUDIT.name=RANGERAUDIT
+appender.RANGERAUDIT.fileName=${sys:hive.log.dir}/ranger-hive-audit.log
+appender.RANGERAUDIT.filePermissions=rwxrwxrwx
+appender.RANGERAUDIT.layout.type=PatternLayout
+appender.RANGERAUDIT.layout.pattern=%d{ISO8601} %q %5p [%t] %c{2} (%F:%M(%L)) - %m%n
+EOF
 fi
 
 # install Ranger hdfs plugin
@@ -35,13 +54,26 @@ if [[ -n "${RANGER_HDFS_REPOSITORY_NAME}" && -n "${RANGER_SERVER_URL}" ]]; then
   ${RANGER_HDFS_PLUGIN_HOME}/enable-hdfs-plugin.sh
 
   # Reduce poll policy interval in the ranger plugin configuration
-  sed -i '/<name>ranger.plugin.hive.policy.pollIntervalMs<\/name>/{n;s/<value>30000<\/value>/<value>1000<\/value>/}' ${HIVE_HOME}/conf/ranger-hdfs-security.xml
+  sed -i '/<name>ranger.plugin.hive.policy.pollIntervalMs<\/name>/{n;s/<value>30000<\/value>/<value>1000<\/value>/}' ${HADOOP_HOME}/etc/hadoop/ranger-hdfs-security.xml
+
+  # Enable Ranger audit log in hdfs
+cat <<'EOF' >> ${HADOOP_HOME}/etc/hadoop/log4j.properties
+
+# RANGERAUDIT appender
+ranger.logger=INFO,console,RANGERAUDIT
+log4j.logger.xaaudit=${ranger.logger}
+log4j.appender.RANGERAUDIT=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.RANGERAUDIT.File=${hadoop.log.dir}/ranger-hdfs-audit.log
+log4j.appender.RANGERAUDIT.layout=org.apache.log4j.PatternLayout
+log4j.appender.RANGERAUDIT.layout.ConversionPattern=%d{ISO8601} %p %c{2}: %L %m%n
+log4j.appender.RANGERAUDIT.DatePattern=.yyyy-MM-dd
+EOF
 fi
 
 # update hadoop config use hostname
-sed -i "s/HOST_NAME/$(hostname)/g" ${HADOOP_CONF_DIR}/core-site.xml
-sed -i "s/HOST_NAME/$(hostname)/g" ${HADOOP_CONF_DIR}/hdfs-site.xml
-sed -i "s/HOST_NAME/$(hostname)/g" ${HIVE_HOME}/conf/hive-site.xml
+sed -i "s/__REPLACE__HOST_NAME/$(hostname)/g" ${HADOOP_CONF_DIR}/core-site.xml
+sed -i "s/__REPLACE__HOST_NAME/$(hostname)/g" ${HADOOP_CONF_DIR}/hdfs-site.xml
+sed -i "s/__REPLACE__HOST_NAME/$(hostname)/g" ${HIVE_HOME}/conf/hive-site.xml
 
 # start hdfs
 echo "Starting HDFS..."
