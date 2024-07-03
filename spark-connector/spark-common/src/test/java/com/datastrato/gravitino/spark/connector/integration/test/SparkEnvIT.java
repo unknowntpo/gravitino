@@ -19,6 +19,7 @@ import com.datastrato.gravitino.spark.connector.GravitinoSparkConfig;
 import com.datastrato.gravitino.spark.connector.iceberg.IcebergPropertiesConstants;
 import com.datastrato.gravitino.spark.connector.integration.test.util.SparkUtilIT;
 import com.datastrato.gravitino.spark.connector.plugin.GravitinoSparkPlugin;
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -125,7 +126,7 @@ public abstract class SparkEnvIT extends SparkUtilIT {
   }
 
   private void initHiveEnv() {
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
     hiveMetastoreUri =
         String.format(
             "thrift://%s:%d",

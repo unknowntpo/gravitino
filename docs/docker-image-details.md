@@ -119,6 +119,17 @@ You can use this kind of image to test the catalog of Apache Hive.
 
 Changelog
 
+- gravitino-ci-hive:0.1.13
+  - Enable Ranger plugin in the Hive and HDFS
+  - Hive version 3.1.3
+  - HDFS version 3.1.0
+  - Ranger plugin version 2.4.0
+  - Support Docker environment variables:
+    - `RANGER_SERVER_URL`: Ranger admin URL
+    - `RANGER_HIVE_REPOSITORY_NAME`: Hive repository name in Ranger
+    - `RANGER_HDFS_REPOSITORY_NAME`: HDFS repository name in Ranger
+    - Example: docker run -e RANGER_SERVER_URL='http://ranger-server:6080' -e RANGER_HIVE_REPOSITORY_NAME='hiveDev' -e RANGER_HDFS_REPOSITORY_NAME='hdfsDev' ... datastrato/gravitino-ci-hive:0.1.13
+
 - gravitino-ci-hive:0.1.12
   - Shrink hive Docker image size by 420MB
 

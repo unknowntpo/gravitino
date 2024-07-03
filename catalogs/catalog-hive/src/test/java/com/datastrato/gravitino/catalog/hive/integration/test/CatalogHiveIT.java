@@ -151,7 +151,7 @@ public class CatalogHiveIT extends AbstractIT {
 
   @BeforeAll
   public static void startup() throws Exception {
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
 
     HIVE_METASTORE_URIS =
         String.format(

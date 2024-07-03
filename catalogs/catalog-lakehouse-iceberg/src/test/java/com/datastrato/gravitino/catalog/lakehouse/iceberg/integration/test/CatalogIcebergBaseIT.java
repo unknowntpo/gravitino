@@ -110,7 +110,7 @@ public abstract class CatalogIcebergBaseIT extends AbstractIT {
   public void startup() throws Exception {
     ignoreIcebergRestService = false;
     AbstractIT.startIntegrationTest();
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
     initIcebergCatalogProperties();
     createMetalake();
     createCatalog();

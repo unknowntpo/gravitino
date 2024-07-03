@@ -14,6 +14,7 @@ import com.datastrato.gravitino.integration.test.container.ContainerSuite;
 import com.datastrato.gravitino.integration.test.container.HiveContainer;
 import com.datastrato.gravitino.integration.test.util.AbstractIT;
 import com.datastrato.gravitino.integration.test.util.GravitinoITUtils;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class GravitinoVirtualFileSystemIT extends AbstractIT {
 
   @BeforeAll
   public static void startUp() {
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
     Assertions.assertFalse(client.metalakeExists(metalakeName));
     metalake = client.createMetalake(metalakeName, "metalake comment", Collections.emptyMap());
     Assertions.assertTrue(client.metalakeExists(metalakeName));

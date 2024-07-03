@@ -19,6 +19,7 @@ import com.datastrato.gravitino.integration.test.container.ContainerSuite;
 import com.datastrato.gravitino.integration.test.util.AbstractIT;
 import com.datastrato.gravitino.integration.test.util.GravitinoITUtils;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,7 +52,7 @@ public abstract class CatalogPaimonBaseIT extends AbstractIT {
 
   @BeforeAll
   public void startup() {
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
     createMetalake();
     createCatalog();
     createSchema();

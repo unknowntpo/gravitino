@@ -79,7 +79,7 @@ public abstract class FlinkEnvIT extends AbstractIT {
   }
 
   private static void initHiveEnv() {
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
     hiveMetastoreUri =
         String.format(
             "thrift://%s:%d",

@@ -54,7 +54,7 @@ public class HadoopCatalogIT extends AbstractIT {
 
   @BeforeAll
   public static void setup() throws IOException {
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
 
     Configuration conf = new Configuration();
     conf.set("fs.defaultFS", defaultBaseLocation());

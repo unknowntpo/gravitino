@@ -83,7 +83,7 @@ public class ProxyCatalogHiveIT extends AbstractIT {
     configs.put(Configs.AUTHENTICATOR.getKey(), AuthenticatorType.SIMPLE.name().toLowerCase());
     registerCustomConfigs(configs);
     AbstractIT.startIntegrationTest();
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
     HIVE_METASTORE_URIS =
         String.format(
             "thrift://%s:%d",

@@ -83,7 +83,7 @@ public class ContainerSuite implements Closeable {
     return network;
   }
 
-  public void startHiveContainer() {
+  public void startHiveContainer(boolean enableRangerPlugin, Map<String, String> envVars) {
     if (hiveContainer == null) {
       synchronized (ContainerSuite.class) {
         if (hiveContainer == null) {
@@ -91,9 +91,11 @@ public class ContainerSuite implements Closeable {
           HiveContainer.Builder hiveBuilder =
               HiveContainer.builder()
                   .withHostName("gravitino-ci-hive")
+                  .withRangerEnable(enableRangerPlugin)
                   .withEnvVars(
                       ImmutableMap.<String, String>builder()
                           .put("HADOOP_USER_NAME", "datastrato")
+                          .putAll(envVars)
                           .build())
                   .withNetwork(network);
           HiveContainer container = closer.register(hiveBuilder.build());

@@ -12,6 +12,7 @@ import com.datastrato.gravitino.catalog.lakehouse.iceberg.IcebergRESTService;
 import com.datastrato.gravitino.integration.test.container.ContainerSuite;
 import com.datastrato.gravitino.integration.test.container.HiveContainer;
 import com.datastrato.gravitino.integration.test.util.GravitinoITUtils;
+import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Tag;
@@ -29,7 +30,7 @@ public class IcebergRESTJdbcCatalogIT extends IcebergRESTServiceIT {
 
   @Override
   void initEnv() {
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
   }
 
   public Map<String, String> getCatalogConfig() {

@@ -41,7 +41,7 @@ public class CatalogIT extends AbstractIT {
 
   @BeforeAll
   public static void startUp() {
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
     hmsUri =
         String.format(
             "thrift://%s:%d",

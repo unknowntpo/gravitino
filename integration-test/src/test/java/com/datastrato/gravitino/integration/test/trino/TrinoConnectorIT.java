@@ -78,7 +78,7 @@ public class TrinoConnectorIT extends AbstractIT {
   public static void startDockerContainer() throws IOException, TException, InterruptedException {
     String trinoConfDir = System.getenv("TRINO_CONF_DIR");
 
-    containerSuite.startHiveContainer();
+    containerSuite.startHiveContainer(false, ImmutableMap.of());
 
     // Initial hive client
     HiveConf hiveConf = new HiveConf();
