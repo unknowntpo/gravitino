@@ -18,6 +18,18 @@
 # under the License.
 #
 
+echo "before link"
+ls -la ${HIVE_HOME}
+
+if [[ "${ENABLE_RANGER_PLUGIN}" == "true" ]]; then
+  # $HIVE_HOME already has some files, so we need to use ${HIVE3_HOME}/*, not ${HIVE3_HOME} as source_file
+  ln -s ${HIVE3_HOME}/* ${HIVE_HOME}
+  ln -s ${HADOOP3_HOME}/* ${HADOOP_HOME}
+else
+  ln -s ${HIVE2_HOME}/* ${HIVE_HOME}
+  ln -s ${HADOOP2_HOME}/* ${HADOOP_HOME}
+fi
+
 # install Ranger hive plugin
 if [[ -n "${RANGER_HIVE_REPOSITORY_NAME}" && -n "${RANGER_SERVER_URL}" ]]; then
   # If Hive enable Ranger plugin need requires zookeeper

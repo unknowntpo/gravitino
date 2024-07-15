@@ -20,8 +20,10 @@
 FROM ubuntu:16.04
 LABEL maintainer="dev@gravitino.apache.org"
 
-ARG HADOOP_VERSION
-ARG HIVE_VERSION
+ARG HADOOP2_VERSION
+ARG HADOOP3_VERSION
+ARG HIVE2_VERSION
+ARG HIVE3_VERSION
 ARG ZOOKEEPER_VERSION
 ARG RANGER_VERSION
 ARG MYSQL_JDBC_DRIVER_VERSION
@@ -65,7 +67,11 @@ RUN cat /dev/zero | ssh-keygen -q -N "" > /dev/null && cat /root/.ssh/id_rsa.pub
 # set environment variables
 ENV JAVA_HOME=/usr/local/jdk
 ENV HIVE_HOME=/usr/local/hive
+ENV HIVE2_HOME=/usr/local/hive2
+ENV HIVE3_HOME=/usr/local/hive3
 ENV HADOOP_HOME=/usr/local/hadoop
+ENV HADOOP2_HOME=/usr/local/hadoop2
+ENV HADOOP3_HOME=/usr/local/hadoop3
 ENV HADOOP_HEAPSIZE=512
 ENV HADOOP_INSTALL=${HADOOP_HOME}
 ENV HADOOP_MAPRED_HOME=${HADOOP_INSTALL}
@@ -123,8 +129,10 @@ RUN ln -s /opt/ranger-${RANGER_VERSION}-hive-plugin ${RANGER_HIVE_PLUGIN_HOME}
 
 ################################################################################
 # install hadoop
-ADD packages/hadoop-${HADOOP_VERSION}.tar.gz /opt/
-RUN ln -s /opt/hadoop-${HADOOP_VERSION} ${HADOOP_HOME}
+ADD packages/hadoop-${HADOOP2_VERSION}.tar.gz /opt/
+RUN ln -s /opt/hadoop-${HADOOP2_VERSION} ${HADOOP2_HOME}
+ADD packages/hadoop-${HADOOP3_VERSION}.tar.gz /opt/
+RUN ln -s /opt/hadoop-${HADOOP3_VERSION} ${HADOOP3_HOME}
 
 # replace configuration templates
 RUN rm -f ${HADOOP_CONF_DIR}/core-site.xml
@@ -139,9 +147,15 @@ ADD mapred-site.xml ${HADOOP_CONF_DIR}/mapred-site.xml
 ADD check-status.sh /tmp/check-status.sh
 
 ################################################################################
-# install hive
-ADD packages/apache-hive-${HIVE_VERSION}-bin.tar.gz /opt/
-RUN ln -s /opt/apache-hive-${HIVE_VERSION}-bin ${HIVE_HOME}
+RUN mkdir -p ${HIVE_HOME}/lib
+
+# install hive2
+ADD packages/apache-hive-${HIVE2_VERSION}-bin.tar.gz /opt/
+RUN ln -s /opt/apache-hive-${HIVE2_VERSION}-bin ${HIVE2_HOME}
+
+# install hive3
+ADD packages/apache-hive-${HIVE3_VERSION}-bin.tar.gz /opt/
+RUN ln -s /opt/apache-hive-${HIVE3_VERSION}-bin ${HIVE3_HOME}
 
 ADD hive-site.xml ${HIVE_HOME}/conf/hive-site.xml
 
@@ -180,6 +194,9 @@ RUN chown -R datastrato:hadoop /home/datastrato
 # removed install packages and cache
 RUN rm -rf /tmp/packages
 RUN rm -rf /var/lib/apt/lists/*
+
+RUN touch ${HIVE_HOME}/conf/orig.txt
+RUN touch ${HIVE_HOME}/lib/orig.txt
 
 ################################################################################
 # expose port
