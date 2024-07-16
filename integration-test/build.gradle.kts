@@ -160,7 +160,7 @@ tasks.test {
 
     doFirst {
       // Gravitino CI Docker image
-      environment("GRAVITINO_CI_HIVE_DOCKER_IMAGE", "datastrato/gravitino-ci-hive2:latest")
+      environment("GRAVITINO_CI_HIVE_DOCKER_IMAGE", "unknowntpo/gravitino-ci-hive2:latest")
       environment("GRAVITINO_CI_HIVE3_DOCKER_IMAGE", "unknowntpo/gravitino-ci-hive3:latest") // Support Ranger plugin
       environment("GRAVITINO_CI_TRINO_DOCKER_IMAGE", "datastrato/gravitino-ci-trino:0.1.5")
       environment("GRAVITINO_CI_KAFKA_DOCKER_IMAGE", "apache/kafka:3.7.0")
