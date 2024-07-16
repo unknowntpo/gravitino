@@ -42,7 +42,7 @@ public class HiveContainer extends BaseContainer {
   public static final String KERBEROS_IMAGE =
       System.getenv("GRAVITINO_CI_KERBEROS_HIVE_DOCKER_IMAGE");
 
-  public static final String RANGER_IMAGE = System.getenv("GRAVITINO_CI_RANGER_HIVE_DOCKER_IMAGE");
+  public static final String RANGER_IMAGE = System.getenv("GRAVITINO_CI_HIVE3_DOCKER_IMAGE");
   public static final String HOST_NAME = "gravitino-ci-hive";
   public static final String HADOOP_USER_NAME = "HADOOP_USER_NAME";
   private static final int MYSQL_PORT = 3306;

@@ -91,6 +91,10 @@ if [[ "${component_type}" == "hive" ]]; then
 elif [[ "${component_type}" == "kerberos-hive" ]]; then
   . ${script_dir}/kerberos-hive/hive-dependency.sh
   build_args="--build-arg HADOOP_PACKAGE_NAME=${HADOOP_PACKAGE_NAME} --build-arg HIVE_PACKAGE_NAME=${HIVE_PACKAGE_NAME} --build-arg JDBC_DIVER_PACKAGE_NAME=${JDBC_DIVER_PACKAGE_NAME}"
+elif [[ "${component_type}" == "hive3" ]]; then
+  export HIVE_VERSION="3.1.3"
+  . ${script_dir}/hive/hive-dependency.sh
+  build_args="--build-arg HADOOP_PACKAGE_NAME=${HADOOP_PACKAGE_NAME} --build-arg HIVE_PACKAGE_NAME=${HIVE_PACKAGE_NAME} --build-arg HADOOP_VERSION=${HADOOP_VERSION} --build-arg HIVE_VERSION=${HIVE_VERSION} --build-arg MYSQL_JDBC_DRIVER_VERSION=${MYSQL_JDBC_DRIVER_VERSION} --build-arg RANGER_VERSION=${RANGER_VERSION} --build-arg ZOOKEEPER_VERSION=${ZOOKEEPER_VERSION}"
 elif [ "${component_type}" == "trino" ]; then
   . ${script_dir}/trino/trino-dependency.sh
 elif [ "${component_type}" == "gravitino" ]; then
