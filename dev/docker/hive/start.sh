@@ -40,6 +40,11 @@ cp /opt/hadoop-conf/* ${HADOOP_CONF_DIR}
 # Link mysql-connector-java after deciding where HIVE_HOME symbolic link points to.
 ln -s /opt/mysql-connector-java-${MYSQL_JDBC_DRIVER_VERSION}/mysql-connector-java-${MYSQL_JDBC_DRIVER_VERSION}.jar ${HIVE_HOME}/lib
 
+# Fix guava problem
+# See https://issues.apache.org/jira/browse/HIVE-22915
+rm ${HIVE_HOME}/lib/guava-*.jar
+cp ${HADOOP_HOME}/share/hadoop/hdfs/lib/guava-*-jre.jar ${HIVE_HOME}/lib/
+
 # install Ranger hive plugin
 if [[ -n "${RANGER_HIVE_REPOSITORY_NAME}" && -n "${RANGER_SERVER_URL}" ]]; then
   # If Hive enable Ranger plugin need requires zookeeper
