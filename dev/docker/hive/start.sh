@@ -18,17 +18,27 @@
 # under the License.
 #
 
-echo "before link"
-ls -la ${HIVE_HOME}
+# backup config dir, and after symbolic linking, copied content back to config dir
+cp -r ${HIVE_CONF_DIR} /opt/hive-conf
+cp -r ${HADOOP_CONF_DIR} /opt/hadoop-conf
 
-if [[ "${ENABLE_RANGER_PLUGIN}" == "true" ]]; then
-  # $HIVE_HOME already has some files, so we need to use ${HIVE3_HOME}/*, not ${HIVE3_HOME} as source_file
-  ln -s ${HIVE3_HOME}/* ${HIVE_HOME}
-  ln -s ${HADOOP3_HOME}/* ${HADOOP_HOME}
+rm -r ${HIVE_HOME}
+rm -r ${HADOOP_HOME}
+
+if [[ "${HIVE_VERSION}" =~ 3.* ]]; then
+  ln -s ${HIVE3_HOME} ${HIVE_HOME}
+  ln -s ${HADOOP3_HOME} ${HADOOP_HOME}
 else
-  ln -s ${HIVE2_HOME}/* ${HIVE_HOME}
-  ln -s ${HADOOP2_HOME}/* ${HADOOP_HOME}
+  ln -s ${HIVE2_HOME} ${HIVE_HOME}
+  ln -s ${HADOOP2_HOME} ${HADOOP_HOME}
 fi
+
+# Add back hive configuration
+cp /opt/hive-conf/* ${HIVE_CONF_DIR}
+cp /opt/hadoop-conf/* ${HADOOP_CONF_DIR}
+
+# Link mysql-connector-java after deciding where HIVE_HOME symbolic link points to.
+ln -s /opt/mysql-connector-java-${MYSQL_JDBC_DRIVER_VERSION}/mysql-connector-java-${MYSQL_JDBC_DRIVER_VERSION}.jar ${HIVE_HOME}/lib
 
 # install Ranger hive plugin
 if [[ -n "${RANGER_HIVE_REPOSITORY_NAME}" && -n "${RANGER_SERVER_URL}" ]]; then
