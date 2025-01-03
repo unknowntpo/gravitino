@@ -19,12 +19,12 @@
 use fuse3::Errno;
 use gvfs_fuse::config::AppConfig;
 use gvfs_fuse::{gvfs_mount, gvfs_unmount};
-use log::{error, info};
+use tracing::{error, info};
 use tokio::signal;
 
 #[tokio::main]
 async fn main() -> fuse3::Result<()> {
-    tracing_subscriber::fmt().init();
+    tracing_subscriber::fmt::init();
 
     // todo need inmprove the args parsing
     let args: Vec<String> = std::env::args().collect();

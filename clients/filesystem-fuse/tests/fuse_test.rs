@@ -21,7 +21,7 @@ use fuse3::Errno;
 use gvfs_fuse::config::AppConfig;
 use gvfs_fuse::RUN_TEST_WITH_FUSE;
 use gvfs_fuse::{gvfs_mount, gvfs_unmount, test_enable_with};
-use log::{error, info};
+use tracing::{error, info};
 use std::fs::File;
 use std::path::Path;
 use std::sync::Arc;
@@ -87,7 +87,7 @@ impl Drop for FuseTest {
 
 #[test]
 fn test_fuse_with_memory_fs() {
-    tracing_subscriber::fmt().init();
+    tracing_subscriber::fmt::init();
 
     panic::set_hook(Box::new(|info| {
         error!("A panic occurred: {:?}", info);

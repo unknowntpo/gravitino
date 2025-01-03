@@ -24,7 +24,7 @@ use crate::open_dal_filesystem::OpenDalFileSystem;
 use crate::opened_file::{OpenFileFlags, OpenedFile};
 use crate::utils::{parse_location, GvfsResult};
 use async_trait::async_trait;
-use log::error;
+use tracing::error;
 use opendal::layers::LoggingLayer;
 use opendal::services::S3;
 use opendal::{Builder, Operator};
