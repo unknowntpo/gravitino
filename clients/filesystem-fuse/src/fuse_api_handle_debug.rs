@@ -33,7 +33,7 @@ use fuse3::{Errno, FileType, Inode, SetAttr, Timestamp};
 use futures_util::stream;
 use futures_util::stream::BoxStream;
 use futures_util::StreamExt;
-use log::debug;
+use log::{debug, error};
 use std::ffi::{OsStr, OsString};
 use std::fmt;
 use std::fmt::Debug;
@@ -106,7 +106,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("init [id={}]: error: {:?}", req.unique, e);
+                error!("init [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -130,7 +130,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("lookup [id={}]: error: {:?}", req.unique, e);
+                error!("lookup [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -160,7 +160,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("getattr [id={}]: error: {:?}", req.unique, e);
+                error!("getattr [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -184,7 +184,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("setattr [id={}]: error: {:?}", req.unique, e);
+                error!("setattr [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -209,7 +209,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("mkdir [id={}]: error: {:?}", req.unique, e);
+                error!("mkdir [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -227,7 +227,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(())
             }
             Err(e) => {
-                debug!("unlink [id={}]: error: {:?}", req.unique, e);
+                error!("unlink [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -245,7 +245,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(())
             }
             Err(e) => {
-                debug!("rmdir [id={}]: error: {:?}", req.unique, e);
+                error!("rmdir [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -263,7 +263,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("open [id={}]: error: {:?}", req.unique, e);
+                error!("open [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -288,7 +288,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("read [id={}]: error: {:?}", req.unique, e);
+                error!("read [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -318,7 +318,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("write [id={}]: error: {:?}", req.unique, e);
+                error!("write [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -336,7 +336,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("statfs [id={}]: error: {:?}", req.unique, e);
+                error!("statfs [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -365,7 +365,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(())
             }
             Err(e) => {
-                debug!("release [id={}]: error: {:?}", req.unique, e);
+                error!("release [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -383,7 +383,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("opendir [id={}]: error: {:?}", req.unique, e);
+                error!("opendir [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -415,7 +415,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("readdir [id={}]: error: {:?}", req.unique, e);
+                error!("readdir [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -439,7 +439,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(())
             }
             Err(e) => {
-                debug!("releasedir [id={}]: error: {:?}", req.unique, e);
+                error!("releasedir [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -464,7 +464,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("create [id={}]: error: {:?}", req.unique, e);
+                error!("create [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
@@ -496,7 +496,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
                 Ok(reply)
             }
             Err(e) => {
-                debug!("readdirplus [id={}]: error: {:?}", req.unique, e);
+                error!("readdirplus [id={}]: error: {:?}", req.unique, e);
                 Err(e)
             }
         }
