@@ -76,6 +76,7 @@ impl<'a> std::fmt::Debug for FileAttrDebug<'a> {
     }
 }
 
+/// Example output: "2025-01-07 23:01:30.531699"
 fn timestamp_to_readable_time_string(tstmp: Timestamp) -> String {
     DateTime::from_timestamp(tstmp.sec, tstmp.nsec)
         .unwrap()
