@@ -118,7 +118,12 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
     }
 
     async fn lookup(&self, req: Request, parent: Inode, name: &OsStr) -> fuse3::Result<ReplyEntry> {
-        debug!(req.unique, ?req, ?parent, ?name, "lookup started");
+        let parent_stat = self
+            .inner
+            .get_modified_file_stat(parent, Option::None, Option::None, Option::None)
+            .await?;
+        debug!(req.unique, ?req, parent = ?parent_stat.name, ?name, "lookup started");
+
         match self.inner.lookup(req, parent, name).await {
             Ok(reply) => {
                 debug!(req.unique, ?reply, "lookup completed");
@@ -138,7 +143,12 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         fh: Option<u64>,
         flags: u32,
     ) -> fuse3::Result<ReplyAttr> {
-        debug!(req.unique, ?req, ?inode, ?fh, ?flags, "getattr started");
+        let stat = self
+            .inner
+            .get_modified_file_stat(inode, Option::None, Option::None, Option::None)
+            .await?;
+        debug!(req.unique, ?req, "filename" = ?stat.name, ?fh, ?flags, "getattr started");
+
         match self.inner.getattr(req, inode, fh, flags).await {
             Ok(reply) => {
                 // FIXME: reply: ReplyAttr should be formatted in human readable way
@@ -159,7 +169,12 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         fh: Option<u64>,
         set_attr: SetAttr,
     ) -> fuse3::Result<ReplyAttr> {
-        debug!(req.unique, ?req, ?inode, ?fh, ?set_attr, "setattr started");
+        let stat = self
+            .inner
+            .get_modified_file_stat(inode, Option::None, Option::None, Option::None)
+            .await?;
+        debug!(req.unique, ?req, "filename" = ?stat.name, ?fh, ?set_attr, "setattr started");
+
         match self.inner.setattr(req, inode, fh, set_attr).await {
             Ok(reply) => {
                 debug!(req.unique, ?reply, "setattr completed");
@@ -180,10 +195,14 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         mode: u32,
         umask: u32,
     ) -> fuse3::Result<ReplyEntry> {
+        let parent_stat = self
+            .inner
+            .get_modified_file_stat(parent, Option::None, Option::None, Option::None)
+            .await?;
         debug!(
             req.unique,
             ?req,
-            ?parent,
+            parent = ?parent_stat.name,
             ?name,
             mode,
             umask,
@@ -203,7 +222,11 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
     }
 
     async fn unlink(&self, req: Request, parent: Inode, name: &OsStr) -> fuse3::Result<()> {
-        debug!(req.unique, ?req, ?parent, ?name, "unlink started");
+        let parent_stat = self
+            .inner
+            .get_modified_file_stat(parent, Option::None, Option::None, Option::None)
+            .await?;
+        debug!(req.unique, ?req, parent = ?parent_stat.name, ?name, "unlink started");
 
         match self.inner.unlink(req, parent, name).await {
             Ok(()) => {
@@ -218,7 +241,11 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
     }
 
     async fn rmdir(&self, req: Request, parent: Inode, name: &OsStr) -> fuse3::Result<()> {
-        debug!(req.unique, ?req, ?parent, ?name, "rmdir started");
+        let parent_stat = self
+            .inner
+            .get_modified_file_stat(parent, Option::None, Option::None, Option::None)
+            .await?;
+        debug!(req.unique, ?req, parent = ?parent_stat.name, ?name, "rmdir started");
 
         match self.inner.rmdir(req, parent, name).await {
             Ok(()) => {
@@ -233,7 +260,11 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
     }
 
     async fn open(&self, req: Request, inode: Inode, flags: u32) -> fuse3::Result<ReplyOpen> {
-        debug!(req.unique, ?req, ?inode, ?flags, "open started");
+        let stat = self
+            .inner
+            .get_modified_file_stat(inode, Option::None, Option::None, Option::None)
+            .await?;
+        debug!(req.unique, ?req, "filename" = ?stat.name, ?flags, "open started");
 
         match self.inner.open(req, inode, flags).await {
             Ok(reply) => {
@@ -255,10 +286,14 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         offset: u64,
         size: u32,
     ) -> fuse3::Result<ReplyData> {
+        let stat = self
+            .inner
+            .get_modified_file_stat(inode, Option::None, Option::None, Option::None)
+            .await?;
         debug!(
             req.unique,
             ?req,
-            ?inode,
+            "filename" = ?stat.name,
             ?fh,
             ?offset,
             ?size,
@@ -287,10 +322,14 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         write_flags: u32,
         flags: u32,
     ) -> fuse3::Result<ReplyWrite> {
+        let stat = self
+            .inner
+            .get_modified_file_stat(inode, Option::None, Option::None, Option::None)
+            .await?;
         debug!(
             req.unique,
             ?req,
-            ?inode,
+            "filename" = ?stat.name,
             ?fh,
             ?offset,
             data_len = data.len(),
@@ -316,7 +355,11 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
     }
 
     async fn statfs(&self, req: Request, inode: Inode) -> fuse3::Result<ReplyStatFs> {
-        debug!(req.unique, ?req, ?inode, "statfs started");
+        let stat = self
+            .inner
+            .get_modified_file_stat(inode, Option::None, Option::None, Option::None)
+            .await?;
+        debug!(req.unique, ?req, "filename" = ?stat.name, "statfs started");
 
         match self.inner.statfs(req, inode).await {
             Ok(reply) => {
@@ -339,10 +382,14 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         lock_owner: u64,
         flush: bool,
     ) -> fuse3::Result<()> {
+        let stat = self
+            .inner
+            .get_modified_file_stat(inode, Option::None, Option::None, Option::None)
+            .await?;
         debug!(
             req.unique,
             ?req,
-            ?inode,
+            "pathname" = ?stat.name,
             ?fh,
             ?flags,
             ?lock_owner,
@@ -367,7 +414,11 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
     }
 
     async fn opendir(&self, req: Request, inode: Inode, flags: u32) -> fuse3::Result<ReplyOpen> {
-        debug!(req.unique, ?req, ?inode, ?flags, "opendir started");
+        let stat = self
+            .inner
+            .get_modified_file_stat(inode, Option::None, Option::None, Option::None)
+            .await?;
+        debug!(req.unique, ?req, "dirname" = ?stat.name, ?flags, "opendir started");
 
         match self.inner.opendir(req, inode, flags).await {
             Ok(reply) => {
@@ -424,18 +475,19 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         fh: u64,
         flags: u32,
     ) -> fuse3::Result<()> {
-        debug!(
-            "releasedir [req.unique={}]: req: {:?}, inode: {:?}, fh: {:?}, flags: {:?}",
-            req.unique, req, inode, fh, flags
-        );
-        let result = self.inner.releasedir(req, inode, fh, flags).await;
-        match result {
+        let stat = self
+            .inner
+            .get_modified_file_stat(inode, Option::None, Option::None, Option::None)
+            .await?;
+        debug!(req.unique, ?req, "dirname" = ?stat.name, ?fh, ?flags, "releasedir started");
+
+        match self.inner.releasedir(req, inode, fh, flags).await {
             Ok(()) => {
-                debug!("releasedir [req.unique={}]: success", req.unique);
+                debug!(req.unique, "releasedir succeeded");
                 Ok(())
             }
             Err(e) => {
-                error!("releasedir [req.unique={}]: error: {:?}", req.unique, e);
+                error!(req.unique, ?e, "releasedir failed");
                 Err(e)
             }
         }
@@ -449,6 +501,10 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         mode: u32,
         flags: u32,
     ) -> fuse3::Result<ReplyCreated> {
+        let parent_stat = self
+            .inner
+            .get_modified_file_stat(parent, Option::None, Option::None, Option::None)
+            .await?;
         debug!(
             req.unique,
             ?req,
