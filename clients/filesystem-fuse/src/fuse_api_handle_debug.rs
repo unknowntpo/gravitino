@@ -36,11 +36,79 @@ use futures_util::StreamExt;
 use std::ffi::{OsStr, OsString};
 use std::fmt;
 use std::fmt::Debug;
+use std::fmt::Write;
 use std::num::NonZeroU32;
 use std::time::{Duration, SystemTime};
 use tokio::fs::remove_dir_all;
 use tracing::{debug, error};
 use tracing_subscriber::fmt::format;
+
+/// Convert `ReplyAttr` to descriptive string.
+///
+/// Example: `ttl: 1s, FileAttr: { ino: 10000, size: 0, blocks: 0, atime: "2025-01-10 12:12:29.452650", mtime: "2025-01-10 12:12:29.452650", ctime: "2025-01-10 12:12:29.452650", crtime: "2025-01-10 12:12:29.452650", kind: RegularFile, perm: 384, nlink: 1, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }`
+fn reply_attr_to_desc_str(reply_attr: &ReplyAttr) -> String {
+    let mut output = String::new();
+
+    write!(output, "ttl: {:?}, ", reply_attr.ttl).unwrap();
+    write!(output, "FileAttr: {}", file_attr_to_desc_str(&reply_attr.attr)).unwrap();
+
+    output
+}
+
+/// Convert `FileAttr` to descriptive string.
+///
+/// Example: `{ ino: 10000, size: 0, blocks: 0, atime: "2025-01-10 12:12:29.452650", mtime: "2025-01-10 12:12:29.452650", ctime: "2025-01-10 12:12:29.452650", crtime: "2025-01-10 12:12:29.452650", kind: RegularFile, perm: 384, nlink: 1, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }`
+fn file_attr_to_desc_str(attr: &FileAttr) -> String {
+    let mut output = String::new();
+
+    write!(output, "{{ ").unwrap();
+
+    write!(output, "ino: {}, ", attr.ino).unwrap();
+    write!(output, "size: {}, ", attr.size).unwrap();
+    write!(output, "blocks: {}, ", attr.blocks).unwrap();
+    write!(
+        output,
+        "atime: {:?}, ",
+        timestamp_to_desc_string(attr.atime)
+    )
+    .unwrap();
+    write!(
+        output,
+        "mtime: {:?}, ",
+        timestamp_to_desc_string(attr.mtime)
+    )
+    .unwrap();
+    write!(
+        output,
+        "ctime: {:?}, ",
+        timestamp_to_desc_string(attr.ctime)
+    )
+    .unwrap();
+    #[cfg(target_os = "macos")]
+    {
+        write!(
+            output,
+            "crtime: {:?}, ",
+            timestamp_to_desc_string(attr.crtime)
+        )
+        .unwrap();
+    }
+    write!(output, "kind: {:?}, ", attr.kind).unwrap();
+    write!(output, "perm: {}, ", attr.perm).unwrap();
+    write!(output, "nlink: {}, ", attr.nlink).unwrap();
+    write!(output, "uid: {}, ", attr.uid).unwrap();
+    write!(output, "gid: {}, ", attr.gid).unwrap();
+    write!(output, "rdev: {}, ", attr.rdev).unwrap();
+    #[cfg(target_os = "macos")]
+    {
+        write!(output, "flags: {}, ", attr.flags).unwrap();
+    }
+    write!(output, "blksize: {}", attr.blksize).unwrap();
+
+    write!(output, " }}").unwrap();
+
+    output
+}
 
 pub struct FileAttrDebug<'a> {
     pub file_attr: &'a FileAttr,
@@ -153,8 +221,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
 
         match self.inner.getattr(req, inode, fh, flags).await {
             Ok(reply) => {
-                // FIXME: reply: ReplyAttr should be formatted in human readable way
-                debug!(req.unique, ?reply, "getattr completed");
+                debug!(req.unique, reply = %reply_attr_to_desc_str(&reply), "getattr completed");
                 Ok(reply)
             }
             Err(e) => {
@@ -179,7 +246,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
 
         match self.inner.setattr(req, inode, fh, set_attr).await {
             Ok(reply) => {
-                debug!(req.unique, ?reply, "setattr completed");
+                debug!(req.unique, reply = %reply_attr_to_desc_str(&reply), "setattr completed");
                 Ok(reply)
             }
             Err(e) => {
