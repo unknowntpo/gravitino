@@ -18,9 +18,9 @@
  */
 
 use crate::config::AppConfig;
-use crate::filesystem::{FileStat, FileSystemContext, RawFileSystem};
+use crate::filesystem::{FileSystemContext, RawFileSystem};
 use crate::fuse_api_handle::FuseApiHandle;
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::DateTime;
 use fuse3::path::prelude::{ReplyData, ReplyOpen, ReplyStatFs, ReplyWrite};
 use fuse3::path::Request;
 use fuse3::raw::prelude::{
@@ -28,20 +28,11 @@ use fuse3::raw::prelude::{
 };
 use fuse3::raw::reply::{DirectoryEntry, DirectoryEntryPlus};
 use fuse3::raw::Filesystem;
-use fuse3::FileType::{Directory, RegularFile};
-use fuse3::{Errno, FileType, Inode, SetAttr, Timestamp};
-use futures_util::stream;
+use fuse3::{Inode, SetAttr, Timestamp};
 use futures_util::stream::BoxStream;
-use futures_util::StreamExt;
-use std::ffi::{OsStr, OsString};
-use std::fmt;
-use std::fmt::Debug;
+use std::ffi::OsStr;
 use std::fmt::Write;
-use std::num::NonZeroU32;
-use std::time::{Duration, SystemTime};
-use tokio::fs::remove_dir_all;
 use tracing::{debug, error};
-use tracing_subscriber::fmt::format;
 
 /// Convert `ReplyAttr` to descriptive string.
 ///

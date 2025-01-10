@@ -20,7 +20,6 @@ use crate::config::AppConfig;
 use crate::default_raw_filesystem::DefaultRawFileSystem;
 use crate::error::ErrorCode::UnSupportedFilesystem;
 use crate::filesystem::FileSystemContext;
-use crate::fuse_api_handle::FuseApiHandle;
 use crate::fuse_api_handle_debug::FuseApiHandleDebug;
 use crate::fuse_server::FuseServer;
 use crate::gravitino_fileset_filesystem::GravitinoFilesetFileSystem;

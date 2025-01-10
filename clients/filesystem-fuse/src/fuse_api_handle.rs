@@ -32,7 +32,6 @@ use futures_util::stream;
 use futures_util::stream::BoxStream;
 use futures_util::StreamExt;
 use std::ffi::{OsStr, OsString};
-use std::fmt;
 use std::num::NonZeroU32;
 use std::time::{Duration, SystemTime};
 use tracing::debug;
