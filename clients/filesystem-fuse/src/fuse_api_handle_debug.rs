@@ -55,6 +55,33 @@ fn reply_attr_to_desc_str(reply_attr: &ReplyAttr) -> String {
     output
 }
 
+/// Convert `ReplyEntry` to descriptive string.
+///
+/// Example: `ttl: 1s, FileAttr: { ino: 10001, size: 0, blocks: 1, atime: "2025-01-10 22:46:08.444791", mtime: "2025-01-10 22:46:08.444791", ctime: "2025-01-10 22:46:08.444791", crtime: "2025-01-10 22:46:08.444791", kind: Directory, perm: 448, nlink: 0, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }, generation: 0`
+fn reply_entry_to_desc_str(reply_entry: &ReplyEntry) -> String {
+    let mut output = String::new();
+
+    write!(output, "ttl: {:?}, ", reply_entry.ttl).unwrap();
+    write!(output, "FileAttr: {}, ", file_attr_to_desc_str(&reply_entry.attr)).unwrap();
+    write!(output, "generation: {}", reply_entry.generation).unwrap();
+
+    output
+}
+
+/// Convert `ReplyCreated` to descriptive string.
+///
+/// Example: `ttl: 1s, FileAttr: { ino: 10000, size: 0, blocks: 1, atime: "2025-01-10 22:53:45.491337", mtime: "2025-01-10 22:53:45.491337", ctime: "2025-01-10 22:53:45.491337", crtime: "2025-01-10 22:53:45.491337", kind: RegularFile, perm: 384, nlink: 0, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }, generation: 0, fh: 1`
+fn reply_created_to_desc_str(reply_created: &ReplyCreated) -> String {
+    let mut output = String::new();
+
+    write!(output, "ttl: {:?}, ", reply_created.ttl).unwrap();
+    write!(output, "FileAttr: {}, ", file_attr_to_desc_str(&reply_created.attr)).unwrap();
+    write!(output, "generation: {}, ", reply_created.generation).unwrap();
+    write!(output, "fh: {}", reply_created.fh).unwrap();
+
+    output
+}
+
 /// Convert `FileAttr` to descriptive string.
 ///
 /// Example: `{ ino: 10000, size: 0, blocks: 0, atime: "2025-01-10 12:12:29.452650", mtime: "2025-01-10 12:12:29.452650", ctime: "2025-01-10 12:12:29.452650", crtime: "2025-01-10 12:12:29.452650", kind: RegularFile, perm: 384, nlink: 1, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }`
@@ -246,7 +273,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
 
         match self.inner.mkdir(req, parent, name, mode, umask).await {
             Ok(reply) => {
-                debug!(req.unique, ?reply, "mkdir succeeded");
+                debug!(req.unique, reply = %reply_entry_to_desc_str(&reply), "mkdir succeeded");
                 Ok(reply)
             }
             Err(e) => {
@@ -543,8 +570,8 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         debug!(
             req.unique,
             ?req,
-            ?parent,
-            ?name,
+            parent = ?parent_stat.name,
+            "filename" = ?name,
             ?mode,
             ?flags,
             "create started"
@@ -552,7 +579,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
 
         match self.inner.create(req, parent, name, mode, flags).await {
             Ok(reply) => {
-                debug!(req.unique, ?reply, "create succeeded");
+                debug!(req.unique, reply = %reply_created_to_desc_str(&reply), "create succeeded");
                 Ok(reply)
             }
             Err(e) => {
