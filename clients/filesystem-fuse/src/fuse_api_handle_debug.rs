@@ -110,40 +110,6 @@ fn file_attr_to_desc_str(attr: &FileAttr) -> String {
     output
 }
 
-pub struct FileAttrDebug<'a> {
-    pub file_attr: &'a FileAttr,
-}
-
-impl<'a> std::fmt::Debug for FileAttrDebug<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let attr = &self.file_attr;
-        let mut struc = f.debug_struct("FileAttr");
-
-        struc
-            .field("ino", &attr.ino)
-            .field("size", &attr.size)
-            .field("blocks", &attr.blocks)
-            .field("atime", &timestamp_to_desc_string(attr.atime))
-            .field("mtime", &timestamp_to_desc_string(attr.mtime))
-            .field("ctime", &timestamp_to_desc_string(attr.ctime));
-
-        // Conditionally add the "crtime" field only for macOS
-        #[cfg(target_os = "macos")]
-        {
-            struc.field("crtime", &timestamp_to_desc_string(attr.crtime));
-        }
-
-        struc
-            .field("kind", &attr.kind)
-            .field("perm", &attr.perm)
-            .field("nlink", &attr.nlink)
-            .field("uid", &attr.uid)
-            .field("gid", &attr.gid)
-            .field("rdev", &attr.rdev)
-            .finish()
-    }
-}
-
 /// Convert `Timestamp` to descriptive string.
 ///
 /// Example output: "2025-01-07 23:01:30.531699"
