@@ -21,6 +21,7 @@ use crate::default_raw_filesystem::DefaultRawFileSystem;
 use crate::error::ErrorCode::UnSupportedFilesystem;
 use crate::filesystem::FileSystemContext;
 use crate::fuse_api_handle::FuseApiHandle;
+use crate::fuse_api_handle_debug::FuseApiHandleDebug;
 use crate::fuse_server::FuseServer;
 use crate::gravitino_fileset_filesystem::GravitinoFilesetFileSystem;
 use crate::gvfs_creator::create_gvfs_filesystem;
@@ -30,7 +31,6 @@ use log::info;
 use once_cell::sync::Lazy;
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use crate::fuse_api_handle_debug::FuseApiHandleDebug;
 
 static SERVER: Lazy<Mutex<Option<Arc<FuseServer>>>> = Lazy::new(|| Mutex::new(None));
 

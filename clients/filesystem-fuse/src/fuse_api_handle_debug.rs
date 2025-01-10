@@ -50,7 +50,12 @@ fn reply_attr_to_desc_str(reply_attr: &ReplyAttr) -> String {
     let mut output = String::new();
 
     write!(output, "ttl: {:?}, ", reply_attr.ttl).unwrap();
-    write!(output, "FileAttr: {}", file_attr_to_desc_str(&reply_attr.attr)).unwrap();
+    write!(
+        output,
+        "FileAttr: {}",
+        file_attr_to_desc_str(&reply_attr.attr)
+    )
+    .unwrap();
 
     output
 }
@@ -62,7 +67,12 @@ fn reply_entry_to_desc_str(reply_entry: &ReplyEntry) -> String {
     let mut output = String::new();
 
     write!(output, "ttl: {:?}, ", reply_entry.ttl).unwrap();
-    write!(output, "FileAttr: {}, ", file_attr_to_desc_str(&reply_entry.attr)).unwrap();
+    write!(
+        output,
+        "FileAttr: {}, ",
+        file_attr_to_desc_str(&reply_entry.attr)
+    )
+    .unwrap();
     write!(output, "generation: {}", reply_entry.generation).unwrap();
 
     output
@@ -75,7 +85,12 @@ fn reply_created_to_desc_str(reply_created: &ReplyCreated) -> String {
     let mut output = String::new();
 
     write!(output, "ttl: {:?}, ", reply_created.ttl).unwrap();
-    write!(output, "FileAttr: {}, ", file_attr_to_desc_str(&reply_created.attr)).unwrap();
+    write!(
+        output,
+        "FileAttr: {}, ",
+        file_attr_to_desc_str(&reply_created.attr)
+    )
+    .unwrap();
     write!(output, "generation: {}, ", reply_created.generation).unwrap();
     write!(output, "fh: {}", reply_created.fh).unwrap();
 
