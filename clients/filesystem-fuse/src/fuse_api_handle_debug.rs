@@ -55,14 +55,14 @@ impl<'a> std::fmt::Debug for FileAttrDebug<'a> {
             .field("ino", &attr.ino)
             .field("size", &attr.size)
             .field("blocks", &attr.blocks)
-            .field("atime", &timestamp_to_readable_time_string(attr.atime))
-            .field("mtime", &timestamp_to_readable_time_string(attr.mtime))
-            .field("ctime", &timestamp_to_readable_time_string(attr.ctime));
+            .field("atime", &timestamp_to_desc_string(attr.atime))
+            .field("mtime", &timestamp_to_desc_string(attr.mtime))
+            .field("ctime", &timestamp_to_desc_string(attr.ctime));
 
         // Conditionally add the "crtime" field only for macOS
         #[cfg(target_os = "macos")]
         {
-            struc.field("crtime", &timestamp_to_readable_time_string(attr.crtime));
+            struc.field("crtime", &timestamp_to_desc_string(attr.crtime));
         }
 
         struc
@@ -76,8 +76,10 @@ impl<'a> std::fmt::Debug for FileAttrDebug<'a> {
     }
 }
 
+/// Convert `Timestamp` to descriptive string.
+///
 /// Example output: "2025-01-07 23:01:30.531699"
-fn timestamp_to_readable_time_string(tstmp: Timestamp) -> String {
+fn timestamp_to_desc_string(tstmp: Timestamp) -> String {
     DateTime::from_timestamp(tstmp.sec, tstmp.nsec)
         .unwrap()
         .naive_utc()
