@@ -504,6 +504,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
     where
         T: 'a;
 
+    #[allow(clippy::needless_lifetimes)]
     async fn readdir<'a>(
         &'a self,
         req: Request,
@@ -599,6 +600,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
     where
         T: 'a;
 
+    #[allow(clippy::needless_lifetimes)]
     async fn readdirplus<'a>(
         &'a self,
         req: Request,

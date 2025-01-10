@@ -75,21 +75,8 @@ impl<T: RawFileSystem> FuseApiHandle<T> {
             file_stat.mtime = mtime;
         }
 
-        debug!(
-            ?file_id,
-            "filename" = ?file_stat.name,
-            ?size,
-            atime = %to_readable_timestamp_string(file_stat.atime),
-            mtime = %to_readable_timestamp_string(file_stat.mtime),
-            "get_modified_file_stat"
-        );
-
         Ok(file_stat)
     }
-}
-
-fn to_readable_timestamp_string(tstmp: Timestamp) -> String {
-    "".to_string()
 }
 
 impl<T: RawFileSystem> Filesystem for FuseApiHandle<T> {
