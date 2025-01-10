@@ -31,11 +31,11 @@ use fuse3::{Errno, FileType, Inode, SetAttr, Timestamp};
 use futures_util::stream;
 use futures_util::stream::BoxStream;
 use futures_util::StreamExt;
-use log::debug;
 use std::ffi::{OsStr, OsString};
 use std::fmt;
 use std::num::NonZeroU32;
 use std::time::{Duration, SystemTime};
+use tracing::debug;
 
 pub(crate) struct FuseApiHandle<T: RawFileSystem> {
     fs: T,
@@ -66,22 +66,23 @@ impl<T: RawFileSystem> FuseApiHandle<T> {
 
         if let Some(size) = size {
             file_stat.size = size;
-        };
+        }
 
         if let Some(atime) = atime {
             file_stat.atime = atime;
-        };
+        }
 
         if let Some(mtime) = mtime {
             file_stat.mtime = mtime;
-        };
+        }
 
         debug!(
-            "get_modified_file_stat: file_name: {:?}, size: {:?}, atime: {}, mtime: {}",
-            file_stat.name,
-            size,
-            to_readable_timestamp_string(file_stat.atime),
-            to_readable_timestamp_string(file_stat.mtime)
+            ?file_id,
+            "filename" = ?file_stat.name,
+            ?size,
+            atime = %to_readable_timestamp_string(file_stat.atime),
+            mtime = %to_readable_timestamp_string(file_stat.mtime),
+            "get_modified_file_stat"
         );
 
         Ok(file_stat)
@@ -120,7 +121,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandle<T> {
 
     async fn getattr(
         &self,
-        _req: Request,
+        req: Request,
         inode: Inode,
         fh: Option<u64>,
         _flags: u32,
@@ -132,7 +133,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandle<T> {
 
         let file_stat = self.fs.stat(inode).await?;
 
-        debug!("getattr[id={}]: file_stat: {:?}", _req.unique, file_stat);
+        debug!(req.unique, ?req, "filename" = ?file_stat.name, ?fh, "getattr started");
 
         Ok(ReplyAttr {
             ttl: self.default_ttl,
