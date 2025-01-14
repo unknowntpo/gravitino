@@ -127,7 +127,7 @@ fn file_attr_to_desc_str(attr: &FileAttr) -> String {
         .unwrap();
     }
     write!(output, "kind: {:?}, ", attr.kind).unwrap();
-    write!(output, "perm: {}, ", attr.perm).unwrap();
+    write!(output, "perm: {:o}, ", attr.perm).unwrap();
     write!(output, "nlink: {}, ", attr.nlink).unwrap();
     write!(output, "uid: {}, ", attr.uid).unwrap();
     write!(output, "gid: {}, ", attr.gid).unwrap();
