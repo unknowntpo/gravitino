@@ -195,7 +195,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
 
         match self.inner.lookup(req, parent, name).await {
             Ok(reply) => {
-                debug!(req.unique, ?reply, "lookup completed");
+                debug!(req.unique, reply = %reply_entry_to_desc_str(&reply), "lookup completed");
                 Ok(reply)
             }
             Err(e) => {
