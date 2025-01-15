@@ -34,6 +34,31 @@ use std::ffi::OsStr;
 use std::fmt::Write;
 use tracing::{debug, error};
 
+macro_rules! log_result {
+    ($method_call:expr, $method_name:expr, $req:ident, $format_reply_fn:ident) => {
+            match $method_call.await {
+            Ok(reply) => {
+                debug!($req.unique, reply = %$format_reply_fn(&reply), concat!($method_name, " completed"));
+                Ok(reply)
+            }
+            Err(e) => {
+                error!($req.unique, ?e, concat!($method_name, " failed"));
+                Err(e)
+            }
+        }
+    //     match self.inner.lookup(req, parent, name).await {
+    //         Ok(reply) => {
+    //             debug!(req.unique, reply = %reply_entry_to_desc_str(&reply), "lookup completed");
+    //             Ok(reply)
+    //         }
+    //         Err(e) => {
+    //             error!(req.unique, ?e, "lookup failed");
+    //             Err(e)
+    //         }
+    //     }
+    };
+}
+
 /// Convert `ReplyAttr` to descriptive string.
 ///
 /// Example: `ttl: 1s, FileAttr: { ino: 10000, size: 0, blocks: 0, atime: "2025-01-10 12:12:29.452650", mtime: "2025-01-10 12:12:29.452650", ctime: "2025-01-10 12:12:29.452650", crtime: "2025-01-10 12:12:29.452650", kind: RegularFile, perm: 384, nlink: 1, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }`
@@ -193,16 +218,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, parent = ?parent_stat.name, ?name, "lookup started");
 
-        match self.inner.lookup(req, parent, name).await {
-            Ok(reply) => {
-                debug!(req.unique, reply = %reply_entry_to_desc_str(&reply), "lookup completed");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "lookup failed");
-                Err(e)
-            }
-        }
+        log_result!(self.inner.lookup(req, parent, name), "lookup", req, reply_entry_to_desc_str)
     }
 
     async fn getattr(
