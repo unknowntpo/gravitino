@@ -35,6 +35,35 @@ use std::fmt::Write;
 use tracing::{debug, error};
 
 macro_rules! log_result {
+   // No reply printing
+   ($method_call:expr, $method_name:expr, $req:ident) => {
+        match $method_call.await {
+            Ok(reply) => {
+                debug!($req.unique, concat!($method_name, " completed"));
+                Ok(reply)
+            }
+            Err(e) => {
+                error!($req.unique, ?e, concat!($method_name, " failed"));
+                Err(e)
+            }
+        }
+    };
+
+    // Default Debug formatting
+    ($method_call:expr, $method_name:expr, $req:ident, debug) => {
+        match $method_call.await {
+            Ok(reply) => {
+                debug!($req.unique, ?reply, concat!($method_name, " completed"));
+                Ok(reply)
+            }
+            Err(e) => {
+                error!($req.unique, ?e, concat!($method_name, " failed"));
+                Err(e)
+            }
+        }
+    };
+
+    // Format reply with custom format function
     ($method_call:expr, $method_name:expr, $req:ident, $format_reply_fn:ident) => {
             match $method_call.await {
             Ok(reply) => {
@@ -46,16 +75,6 @@ macro_rules! log_result {
                 Err(e)
             }
         }
-    //     match self.inner.lookup(req, parent, name).await {
-    //         Ok(reply) => {
-    //             debug!(req.unique, reply = %reply_entry_to_desc_str(&reply), "lookup completed");
-    //             Ok(reply)
-    //         }
-    //         Err(e) => {
-    //             error!(req.unique, ?e, "lookup failed");
-    //             Err(e)
-    //         }
-    //     }
     };
 }
 
@@ -193,16 +212,7 @@ impl<T: RawFileSystem> FuseApiHandleDebug<T> {
 impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
     async fn init(&self, req: Request) -> fuse3::Result<ReplyInit> {
         debug!(req.unique, ?req, "init");
-        match self.inner.init(req).await {
-            Ok(reply) => {
-                debug!(req.unique, ?reply, "init");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?req, "init");
-                Err(e)
-            }
-        }
+        log_result!(self.inner.init(req), "init", req, debug)
     }
 
     async fn destroy(&self, req: Request) {
@@ -218,7 +228,12 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, parent = ?parent_stat.name, ?name, "lookup started");
 
-        log_result!(self.inner.lookup(req, parent, name), "lookup", req, reply_entry_to_desc_str)
+        log_result!(
+            self.inner.lookup(req, parent, name),
+            "lookup",
+            req,
+            reply_entry_to_desc_str
+        )
     }
 
     async fn getattr(
@@ -234,16 +249,12 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, "filename" = ?stat.name, ?fh, ?flags, "getattr started");
 
-        match self.inner.getattr(req, inode, fh, flags).await {
-            Ok(reply) => {
-                debug!(req.unique, reply = %reply_attr_to_desc_str(&reply), "getattr completed");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "getattr failed");
-                Err(e)
-            }
-        }
+        log_result!(
+            self.inner.getattr(req, inode, fh, flags),
+            "getattr",
+            req,
+            reply_attr_to_desc_str
+        )
     }
 
     async fn setattr(
@@ -259,16 +270,12 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, "filename" = ?stat.name, ?fh, ?set_attr, "setattr started");
 
-        match self.inner.setattr(req, inode, fh, set_attr).await {
-            Ok(reply) => {
-                debug!(req.unique, reply = %reply_attr_to_desc_str(&reply), "setattr completed");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "setattr failed");
-                Err(e)
-            }
-        }
+        log_result!(
+            self.inner.setattr(req, inode, fh, set_attr),
+            "setattr",
+            req,
+            reply_attr_to_desc_str
+        )
     }
 
     async fn mkdir(
@@ -293,16 +300,12 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             "mkdir started"
         );
 
-        match self.inner.mkdir(req, parent, name, mode, umask).await {
-            Ok(reply) => {
-                debug!(req.unique, reply = %reply_entry_to_desc_str(&reply), "mkdir succeeded");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "mkdir failed");
-                Err(e)
-            }
-        }
+        log_result!(
+            self.inner.mkdir(req, parent, name, mode, umask),
+            "mkdir",
+            req,
+            reply_entry_to_desc_str
+        )
     }
 
     async fn unlink(&self, req: Request, parent: Inode, name: &OsStr) -> fuse3::Result<()> {
@@ -312,16 +315,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, parent = ?parent_stat.name, ?name, "unlink started");
 
-        match self.inner.unlink(req, parent, name).await {
-            Ok(()) => {
-                debug!(req.unique, "unlink succeeded");
-                Ok(())
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "unlink failed");
-                Err(e)
-            }
-        }
+        log_result!(self.inner.unlink(req, parent, name), "unlink", req)
     }
 
     async fn rmdir(&self, req: Request, parent: Inode, name: &OsStr) -> fuse3::Result<()> {
@@ -331,16 +325,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, parent = ?parent_stat.name, ?name, "rmdir started");
 
-        match self.inner.rmdir(req, parent, name).await {
-            Ok(()) => {
-                debug!(req.unique, "rmdir succeeded");
-                Ok(())
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "rmdir failed");
-                Err(e)
-            }
-        }
+        log_result!(self.inner.rmdir(req, parent, name), "rmdir", req)
     }
 
     async fn open(&self, req: Request, inode: Inode, flags: u32) -> fuse3::Result<ReplyOpen> {
@@ -350,16 +335,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, "filename" = ?stat.name, ?flags, "open started");
 
-        match self.inner.open(req, inode, flags).await {
-            Ok(reply) => {
-                debug!(req.unique, ?reply, "open succeeded");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "open failed");
-                Err(e)
-            }
-        }
+        log_result!(self.inner.open(req, inode, flags), "open", req, debug)
     }
 
     async fn read(
@@ -384,16 +360,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             "read started"
         );
 
-        match self.inner.read(req, inode, fh, offset, size).await {
-            Ok(reply) => {
-                debug!(req.unique, ?reply, "read succeeded");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "read failed");
-                Err(e)
-            }
-        }
+        log_result!(self.inner.read(req, inode, fh, offset, size), "read", req)
     }
 
     async fn write(
@@ -422,20 +389,12 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             "write started"
         );
 
-        match self
-            .inner
-            .write(req, inode, fh, offset, data, write_flags, flags)
-            .await
-        {
-            Ok(reply) => {
-                debug!(req.unique, ?reply, "write succeeded");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "write failed");
-                Err(e)
-            }
-        }
+        log_result!(
+            self.inner
+                .write(req, inode, fh, offset, data, write_flags, flags),
+            "write",
+            req
+        )
     }
 
     async fn statfs(&self, req: Request, inode: Inode) -> fuse3::Result<ReplyStatFs> {
@@ -445,16 +404,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, "filename" = ?stat.name, "statfs started");
 
-        match self.inner.statfs(req, inode).await {
-            Ok(reply) => {
-                debug!(req.unique, ?reply, "statfs succeeded");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "statfs failed");
-                Err(e)
-            }
-        }
+        log_result!(self.inner.statfs(req, inode), "statfs", req, debug)
     }
 
     async fn release(
@@ -481,20 +431,11 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             "release started"
         );
 
-        match self
-            .inner
-            .release(req, inode, fh, flags, lock_owner, flush)
-            .await
-        {
-            Ok(()) => {
-                debug!(req.unique, "release succeeded");
-                Ok(())
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "release failed");
-                Err(e)
-            }
-        }
+        log_result!(
+            self.inner.release(req, inode, fh, flags, lock_owner, flush),
+            "release",
+            req
+        )
     }
 
     async fn opendir(&self, req: Request, inode: Inode, flags: u32) -> fuse3::Result<ReplyOpen> {
@@ -504,16 +445,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, "dirname" = ?stat.name, ?flags, "opendir started");
 
-        match self.inner.opendir(req, inode, flags).await {
-            Ok(reply) => {
-                debug!(req.unique, ?reply, "opendir succeeded");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "opendir failed");
-                Err(e)
-            }
-        }
+        log_result!(self.inner.opendir(req, inode, flags), "opendir", req, debug)
     }
 
     type DirEntryStream<'a> = BoxStream<'a, fuse3::Result<DirectoryEntry>>
@@ -541,16 +473,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             "readdir started"
         );
 
-        match self.inner.readdir(req, parent, fh, offset).await {
-            Ok(reply) => {
-                debug!(req.unique, "readdir succeeded");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "readdir failed");
-                Err(e)
-            }
-        }
+        log_result!(self.inner.readdir(req, parent, fh, offset), "readdir", req)
     }
 
     async fn releasedir(
@@ -566,16 +489,11 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             .await?;
         debug!(req.unique, ?req, "dirname" = ?stat.name, ?fh, ?flags, "releasedir started");
 
-        match self.inner.releasedir(req, inode, fh, flags).await {
-            Ok(()) => {
-                debug!(req.unique, "releasedir succeeded");
-                Ok(())
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "releasedir failed");
-                Err(e)
-            }
-        }
+        log_result!(
+            self.inner.releasedir(req, inode, fh, flags),
+            "releasedir",
+            req
+        )
     }
 
     async fn create(
@@ -600,16 +518,11 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             "create started"
         );
 
-        match self.inner.create(req, parent, name, mode, flags).await {
-            Ok(reply) => {
-                debug!(req.unique, reply = %reply_created_to_desc_str(&reply), "create succeeded");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "create failed");
-                Err(e)
-            }
-        }
+        log_result!(
+            self.inner.create(req, parent, name, mode, flags),
+            "create",
+            req
+        )
     }
 
     type DirEntryPlusStream<'a> = BoxStream<'a, fuse3::Result<DirectoryEntryPlus>>
@@ -635,19 +548,10 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
             "readdirplus started"
         );
 
-        match self
-            .inner
-            .readdirplus(req, parent, fh, offset, lock_owner)
-            .await
-        {
-            Ok(reply) => {
-                debug!(req.unique, "readdirplus succeeded");
-                Ok(reply)
-            }
-            Err(e) => {
-                error!(req.unique, ?e, "readdirplus failed");
-                Err(e)
-            }
-        }
+        log_result!(
+            self.inner.readdirplus(req, parent, fh, offset, lock_owner),
+            "readdirplus",
+            req
+        )
     }
 }
