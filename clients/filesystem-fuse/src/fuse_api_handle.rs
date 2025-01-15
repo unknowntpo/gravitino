@@ -34,7 +34,6 @@ use futures_util::StreamExt;
 use std::ffi::{OsStr, OsString};
 use std::num::NonZeroU32;
 use std::time::{Duration, SystemTime};
-use tracing::debug;
 
 pub(crate) struct FuseApiHandle<T: RawFileSystem> {
     fs: T,
@@ -118,8 +117,6 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandle<T> {
         }
 
         let file_stat = self.fs.stat(inode).await?;
-
-        debug!(req.unique, ?req, "filename" = ?file_stat.name, ?fh, "getattr started");
 
         Ok(ReplyAttr {
             ttl: self.default_ttl,
