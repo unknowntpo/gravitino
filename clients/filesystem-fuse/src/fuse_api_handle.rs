@@ -106,7 +106,7 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandle<T> {
 
     async fn getattr(
         &self,
-        req: Request,
+        _req: Request,
         inode: Inode,
         fh: Option<u64>,
         _flags: u32,
