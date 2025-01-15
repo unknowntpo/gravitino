@@ -265,6 +265,8 @@ pub struct FuseConfig {
     #[serde(default)]
     pub fs_type: String,
     #[serde(default)]
+    pub fuse_debug: bool,
+    #[serde(default)]
     pub config_path: String,
     #[serde(default)]
     pub properties: HashMap<String, String>,
