@@ -99,12 +99,12 @@ pub async fn create_raw_fs(
     match path_fs {
         CreateFileSystemResult::Memory(fs) => {
             if config.fuse.fuse_debug {
-                let _fs = FuseApiHandleDebug::new(
+                let fs = FuseApiHandleDebug::new(
                     DefaultRawFileSystem::new(fs, config, &fs_context),
                     config,
                     fs_context,
                 );
-                return Ok(CreateFileSystemResult::FuseMemoryFsWithDebug(_fs));
+                return Ok(CreateFileSystemResult::FuseMemoryFsWithDebug(fs));
             }
             let fs = FuseApiHandle::new(
                 DefaultRawFileSystem::new(fs, config, &fs_context),
