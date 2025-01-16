@@ -34,6 +34,51 @@ use std::ffi::OsStr;
 use std::fmt::Write;
 use tracing::{debug, error};
 
+
+/// A macro to log the result of an asynchronous method call in the context of FUSE operations.
+///
+/// This macro provides three variants for logging:
+/// 1. Without logging the reply (logs only the method status).
+/// 2. With default `Debug` formatting for the reply.
+/// 3. With a customizable formatting function for the reply.
+///
+/// # Usage
+///
+/// ```
+/// // No reply printing
+/// log_result!(method_call, "method_name", req);
+///
+/// // With default Debug formatting for the reply
+/// log_result!(method_call, "method_name", req, debug);
+///
+/// // With a custom formatting function for the reply
+/// log_result!(method_call, "method_name", req, custom_format_fn);
+/// ```
+///
+/// # Arguments
+///
+/// - `$method_call`: The asynchronous method call to execute and log.
+/// - `$method_name`: A string representing the name of the method for logging purposes.
+/// - `$req`: The incoming FUSE request associated with the method call.
+/// - `$format_reply_fn`: (Optional) A custom formatting function to describe the reply more specifically.
+///
+/// # Examples
+///
+/// ## Example 1: Logging Without Reply Printing
+/// ```rust
+/// log_result!(some_async_method(), "example_method", req);
+/// ```
+///
+/// ## Example 2: Default Debug Formatting
+/// ```rust
+/// log_result!(some_async_method(), "example_method_debug", req, debug);
+/// ```
+///
+/// ## Example 3: Custom Reply Formatting
+/// Assuming `custom_format_fn` is a function that formats the reply:
+/// ```rust
+/// log_result!(some_async_method(), "example_method_custom", req, custom_format_fn);
+/// ```
 macro_rules! log_result {
    // No reply printing
    ($method_call:expr, $method_name:expr, $req:ident) => {
