@@ -34,7 +34,6 @@ use std::ffi::OsStr;
 use std::fmt::Write;
 use tracing::{debug, error};
 
-
 /// A macro to log the result of an asynchronous method call in the context of FUSE operations.
 ///
 /// This macro provides three variants for logging:
