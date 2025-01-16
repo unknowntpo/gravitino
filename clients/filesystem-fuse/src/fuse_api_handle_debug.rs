@@ -125,7 +125,7 @@ macro_rules! log_result {
 
 /// Convert `ReplyAttr` to descriptive string.
 ///
-/// Example: `ttl: 1s, FileAttr: { ino: 10000, size: 0, blocks: 0, atime: "2025-01-10 12:12:29.452650", mtime: "2025-01-10 12:12:29.452650", ctime: "2025-01-10 12:12:29.452650", crtime: "2025-01-10 12:12:29.452650", kind: RegularFile, perm: 384, nlink: 1, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }`
+/// Example: `ttl: 1s, FileAttr: { ino: 10000, size: 0, blocks: 0, atime: "2025-01-16 02:42:52.600436", mtime: "2025-01-16 02:42:52.600436", ctime: "2025-01-16 02:42:52.600436", crtime: "2025-01-16 02:42:52.600436", kind: RegularFile, perm: 600, nlink: 1, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }`
 fn reply_attr_to_desc_str(reply_attr: &ReplyAttr) -> String {
     let mut output = String::new();
 
@@ -142,7 +142,7 @@ fn reply_attr_to_desc_str(reply_attr: &ReplyAttr) -> String {
 
 /// Convert `ReplyEntry` to descriptive string.
 ///
-/// Example: `ttl: 1s, FileAttr: { ino: 10001, size: 0, blocks: 1, atime: "2025-01-10 22:46:08.444791", mtime: "2025-01-10 22:46:08.444791", ctime: "2025-01-10 22:46:08.444791", crtime: "2025-01-10 22:46:08.444791", kind: Directory, perm: 448, nlink: 0, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }, generation: 0`
+/// Example: `ttl: 1s, FileAttr: { ino: 10001, size: 0, blocks: 1, atime: "2025-01-16 02:42:52.606512", mtime: "2025-01-16 02:42:52.606512", ctime: "2025-01-16 02:42:52.606512", crtime: "2025-01-16 02:42:52.606512", kind: Directory, perm: 700, nlink: 0, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }, generation: 0`
 fn reply_entry_to_desc_str(reply_entry: &ReplyEntry) -> String {
     let mut output = String::new();
 
@@ -160,7 +160,7 @@ fn reply_entry_to_desc_str(reply_entry: &ReplyEntry) -> String {
 
 /// Convert `ReplyCreated` to descriptive string.
 ///
-/// Example: `ttl: 1s, FileAttr: { ino: 10000, size: 0, blocks: 1, atime: "2025-01-10 22:53:45.491337", mtime: "2025-01-10 22:53:45.491337", ctime: "2025-01-10 22:53:45.491337", crtime: "2025-01-10 22:53:45.491337", kind: RegularFile, perm: 384, nlink: 0, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }, generation: 0, fh: 1`
+/// Example: `ttl: 1s, FileAttr: { ino: 10000, size: 0, blocks: 1, atime: "2025-01-16 02:47:32.126592", mtime: "2025-01-16 02:47:32.126592", ctime: "2025-01-16 02:47:32.126592", crtime: "2025-01-16 02:47:32.126592", kind: RegularFile, perm: 600, nlink: 0, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }, generation: 0, fh: 1`
 fn reply_created_to_desc_str(reply_created: &ReplyCreated) -> String {
     let mut output = String::new();
 
@@ -179,7 +179,7 @@ fn reply_created_to_desc_str(reply_created: &ReplyCreated) -> String {
 
 /// Convert `FileAttr` to descriptive string.
 ///
-/// Example: `{ ino: 10000, size: 0, blocks: 0, atime: "2025-01-10 12:12:29.452650", mtime: "2025-01-10 12:12:29.452650", ctime: "2025-01-10 12:12:29.452650", crtime: "2025-01-10 12:12:29.452650", kind: RegularFile, perm: 384, nlink: 1, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }`
+/// Example: `{ ino: 10000, size: 0, blocks: 1, atime: "2025-01-10 22:53:45.491337", mtime: "2025-01-10 22:53:45.491337", ctime: "2025-01-10 22:53:45.491337", crtime: "2025-01-10 22:53:45.491337", kind: RegularFile, perm: 384, nlink: 0, uid: 501, gid: 20, rdev: 0, flags: 0, blksize: 8192 }`
 fn file_attr_to_desc_str(attr: &FileAttr) -> String {
     let mut output = String::new();
 
@@ -566,7 +566,8 @@ impl<T: RawFileSystem> Filesystem for FuseApiHandleDebug<T> {
         log_result!(
             self.inner.create(req, parent, name, mode, flags),
             "create",
-            req
+            req,
+            reply_created_to_desc_str
         )
     }
 
