@@ -43,7 +43,7 @@ use tracing::{debug, error};
 ///
 /// # Usage
 ///
-/// ```
+/// ```ignore
 /// // No reply printing
 /// log_result!(method_call, "method_name", req);
 ///
@@ -60,24 +60,6 @@ use tracing::{debug, error};
 /// - `$method_name`: A string representing the name of the method for logging purposes.
 /// - `$req`: The incoming FUSE request associated with the method call.
 /// - `$format_reply_fn`: (Optional) A custom formatting function to describe the reply more specifically.
-///
-/// # Examples
-///
-/// ## Example 1: Logging Without Reply Printing
-/// ```rust
-/// log_result!(some_async_method(), "example_method", req);
-/// ```
-///
-/// ## Example 2: Default Debug Formatting
-/// ```rust
-/// log_result!(some_async_method(), "example_method_debug", req, debug);
-/// ```
-///
-/// ## Example 3: Custom Reply Formatting
-/// Assuming `custom_format_fn` is a function that formats the reply:
-/// ```rust
-/// log_result!(some_async_method(), "example_method_custom", req, custom_format_fn);
-/// ```
 macro_rules! log_result {
    // No reply printing
    ($method_call:expr, $method_name:expr, $req:ident) => {
