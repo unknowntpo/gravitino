@@ -34,17 +34,14 @@ use tracing::{error, info};
 
 fn init_work_dirs(config: &AppConfig, mount_point: &str) -> io::Result<()> {
     let data_dir_name = Path::new(&config.fuse.data_dir).to_path_buf();
-    let data_dir_name = data_dir_name.canonicalize()?;
     if !data_dir_name.exists() {
-        Err(io::Error::new(
-            io::ErrorKind::NotFound,
-            format!("Data directory {} not found", &config.fuse.data_dir),
-        ))?
+        create_dir(&data_dir_name)?
     };
+    let data_dir_name = data_dir_name.canonicalize()?;
 
     let mount_point_name = data_dir_name.join(mount_point);
     if !mount_point_name.exists() {
-        create_dir(&mount_point_name)?
+        create_dir(&mount_point_name)?;
     };
 
     let log_dir_name = data_dir_name.join(&config.fuse.log_dir);
@@ -167,14 +164,14 @@ fn do_umount(_mp: &str, _force: bool) -> std::io::Result<()> {
 }
 
 fn main() -> Result<(), i32> {
-    tracing_subscriber::fmt().init();
+    tracing_subscriber::fmt::init();
     let args = command_args::Arguments::parse();
     match args.command {
         Commands::Mount {
             mount_point,
             fileset_location,
             config,
-            debug: _,
+            debug,
             foreground,
         } => {
             let app_config = AppConfig::from_file(config);
@@ -182,7 +179,7 @@ fn main() -> Result<(), i32> {
                 error!("Failed to load config: {:?}", e);
                 return Err(-1);
             };
-            let app_config = app_config.unwrap();
+            let mut app_config = app_config.unwrap();
 
             let mount_point = {
                 let path = Path::new(&mount_point).canonicalize();
@@ -193,6 +190,8 @@ fn main() -> Result<(), i32> {
                 let path = path.unwrap();
                 path.to_string_lossy().to_string()
             };
+
+            app_config.fuse.fuse_debug = debug > 0;
 
             let result = init_work_dirs(&app_config, &mount_point);
             if let Err(e) = result {
