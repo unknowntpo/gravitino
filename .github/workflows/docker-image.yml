@@ -120,6 +120,19 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
 
+      # These steps is needed to let docker-compose access runner's file system
+      - name: Check groups of runner
+        run: |
+          groups runner
+      - name: Create user and set permissions
+        run: |
+          sudo useradd ranger
+          sudo usermod -aG docker ranger
+          sudo usermod -aG adm ranger
+      - name: Verify user creation
+        run: |
+          id ranger
+
       - name: Build and Push the Docker image
         run: | 
           sudo rm -rf /usr/local/lib/android
