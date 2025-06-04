@@ -23,8 +23,7 @@ trino_dir="$(dirname "${BASH_SOURCE-$0}")"
 trino_dir="$(cd "${trino_dir}">/dev/null; pwd)"
 gravitino_home="$(cd "${trino_dir}/../../..">/dev/null; pwd)"
 
-# Clean packages
-rm -rf "${trino_dir}/packages"
+# Prepare download packages
 mkdir -p "${trino_dir}/packages"
 
 cd ${gravitino_home}
@@ -35,6 +34,8 @@ MYSQL_VERSION="8.0.27"
 PG_VERSION="42.7.0"
 MYSQL_JAVA_CONNECTOR_URL="https://repo1.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_VERSION}/mysql-connector-java-${MYSQL_VERSION}.jar"
 PG_JAVA_CONNECTOR_URL="https://jdbc.postgresql.org/download/postgresql-${PG_VERSION}.jar"
+RANGER_TRINO_PLUGIN_PACKAGE_NAME="ranger-2.4.0-trino-plugin.tar.gz"
+RANGER_TRINO_PLUGIN_PACKAGE_URL="https://github.com/unknowntpo/apache-ranger/releases/download/v2.4.41/${RANGER_TRINO_PLUGIN_PACKAGE_NAME}"
 
 # Download MySQL jdbc driver if it does not exist.
 if [ ! -f "${trino_dir}/packages/gravitino-trino-connector/mysql-connector-java-${MYSQL_VERSION}.jar" ]; then
@@ -45,6 +46,19 @@ fi
 if [ ! -f "${trino_dir}/packages/gravitino-trino-connector/postgresql-{PG_VERSION}.jar" ]; then
   cd "${trino_dir}/packages/gravitino-trino-connector/" && curl -O "$PG_JAVA_CONNECTOR_URL" && cd -
 fi
+
+echo "xxx Here"
+echo "trino dir: ${trino_dir}"
+
+echo "RANGER_TRINO_PLUGIN_PACKAGE_NAME: ${RANGER_TRINO_PLUGIN_PACKAGE_NAME}"
+
+# Download Ranger trino plugin if it does not exist.
+if [ ! -f "${trino_dir}/packages/${RANGER_TRINO_PLUGIN_PACKAGE_NAME}" ]; then
+  curl -L -s -o "${trino_dir}/packages/${RANGER_TRINO_PLUGIN_PACKAGE_NAME}" ${RANGER_TRINO_PLUGIN_PACKAGE_URL}
+fi
+
+echo "xxx Here done"
+
 
 mkdir -p "${trino_dir}/packages/trino"
 cp -r -p "${trino_dir}/conf" "${trino_dir}/packages/trino/conf"

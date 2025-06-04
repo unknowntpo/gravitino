@@ -59,9 +59,13 @@ RUN rm -rf /usr/lib/trino/plugin/accumulo  \
     && rm -rf /usr/lib/trino/plugin/redis \
     && rm -rf /usr/lib/trino/plugin/session-property-managers \
     && rm -rf /usr/lib/trino/plugin/teradata-functions
+
+ARG RANGER_TRINO_PLUGIN_PACKAGE_NAME
+
 COPY --chown=trino:trino packages/trino/conf /etc/trino
 COPY --chown=trino:trino packages/gravitino-trino-connector/mysql-connector-java-8.0.27.jar /usr/lib/trino/plugin/iceberg/
 COPY --chown=trino:trino packages/gravitino-trino-connector/postgresql-42.7.0.jar /usr/lib/trino/plugin/iceberg/
+COPY --chown=trino:trino packages/${RANGER_TRINO_PLUGIN_PACKAGE_NAME} /usr/lib/trino/plugin/ranger/
 
 RUN mkdir /tmp/gravitino
 COPY --chown=trino:trino packages/gravitino-trino-connector /tmp/gravitino

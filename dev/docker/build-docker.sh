@@ -105,6 +105,7 @@ elif [[ "${component_type}" == "kerberos-hive" ]]; then
   build_args="--build-arg HADOOP_PACKAGE_NAME=${HADOOP_PACKAGE_NAME} --build-arg HIVE_PACKAGE_NAME=${HIVE_PACKAGE_NAME} --build-arg JDBC_DIVER_PACKAGE_NAME=${JDBC_DIVER_PACKAGE_NAME}"
 elif [ "${component_type}" == "trino" ]; then
   . ${script_dir}/trino/trino-dependency.sh
+  build_args="--build-arg RANGER_TRINO_PLUGIN_PACKAGE_NAME=${RANGER_TRINO_PLUGIN_PACKAGE_NAME}"
 elif [ "${component_type}" == "gravitino" ]; then
   . ${script_dir}/gravitino/gravitino-dependency.sh
 elif [ "${component_type}" == "doris" ]; then
