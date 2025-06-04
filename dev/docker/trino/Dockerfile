@@ -59,6 +59,9 @@ RUN rm -rf /usr/lib/trino/plugin/accumulo  \
     && rm -rf /usr/lib/trino/plugin/redis \
     && rm -rf /usr/lib/trino/plugin/session-property-managers \
     && rm -rf /usr/lib/trino/plugin/teradata-functions
+
+ARG RANGER_TRINO_PLUGIN_PACKAGE_NAME
+
 COPY --chown=trino:trino packages/trino/conf /etc/trino
 COPY --chown=trino:trino packages/gravitino-trino-connector/mysql-connector-java-8.0.27.jar /usr/lib/trino/plugin/iceberg/
 COPY --chown=trino:trino packages/gravitino-trino-connector/postgresql-42.7.0.jar /usr/lib/trino/plugin/iceberg/
@@ -76,6 +79,13 @@ RUN case "$TAG_NAME" in \
         ;; \
     esac
 
+ENV RANGER_TRINO_PLUGIN_HOME=/usr/lib/trino/plugin/ranger/ranger-trino-plugin
+
+# install ranger trino plugin
+ADD packages/${RANGER_TRINO_PLUGIN_PACKAGE_NAME} /opt/
+RUN mkdir -p /usr/lib/trino/plugin/ranger
+RUN ln -s /opt/ranger-2.4.0-trino-plugin ${RANGER_TRINO_PLUGIN_HOME}
+
 # The following ENV are needed to update configuration file before starting Trino server, you need to
 # pass these ENV variables to the container when starting it like `docker run --env GRAVITINO_HOST_IP=xxx --env GRAVITINO_HOST_PORT=xxxx`
 #ENV GRAVITINO_HOST_IP
@@ -83,4 +93,7 @@ RUN case "$TAG_NAME" in \
 #ENV GRAVITINO_METALAKE_NAME
 #ENV HADOOP_USER_NAME
 
-ENTRYPOINT ["/bin/bash", "-c", "/etc/trino/update-trino-conf.sh && /usr/lib/trino/bin/run-trino"]
+# create startup script and set ENTRYPOINT
+WORKDIR /
+ADD start.sh /usr/local/sbin
+ENTRYPOINT ["/bin/bash", "/usr/local/sbin/start.sh"]
