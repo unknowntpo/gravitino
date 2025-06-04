@@ -36,7 +36,7 @@ EOF
 # Get platform type
 if [[ "$1" == "--platform" ]]; then
   shift
-  platform_type="$1"
+    platform_type="$1"
   if [[ "${platform_type}" == "linux/amd64" || "${platform_type}" == "linux/arm64" || "${platform_type}" == "all" ]]; then
     echo "INFO : platform type is ${platform_type}"
   else

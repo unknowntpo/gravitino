@@ -125,6 +125,16 @@ jobs:
         run: |
           dev/ci/util_free_space.sh
 
+      - name: Install shfmt
+        run: |
+          curl -sSLo shfmt https://github.com/mvdan/sh/releases/download/v3.8.0/shfmt_v3.8.0_linux_amd64 &&
+          chmod +x shfmt &&
+          sudo mv shfmt /usr/local/bin/shfmt
+
+      - name: Lint Shell Scripts
+        run: |
+          find . -name '*.sh' -print0 | xargs -0 shfmt -d          
+
       - name: Build with Gradle
         run: ./gradlew build -PskipITs -PjdkVersion=${{ matrix.java-version }} -PskipDockerTests=false -x :clients:client-python:build
 
