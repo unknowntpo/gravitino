@@ -35,8 +35,8 @@ PG_VERSION="42.7.0"
 MYSQL_JAVA_CONNECTOR_URL="https://repo1.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_VERSION}/mysql-connector-java-${MYSQL_VERSION}.jar"
 PG_JAVA_CONNECTOR_URL="https://jdbc.postgresql.org/download/postgresql-${PG_VERSION}.jar"
 RANGER_TRINO_PLUGIN_PACKAGE_NAME="ranger-2.4.0-trino-plugin.tar.gz"
-RANGER_TRINO_PLUGIN_PACKAGE_URL="https://github.com/unknowntpo/apache-ranger/releases/download/v2.4.41/${RANGER_TRINO_PLUGIN_PACKAGE_NAME}"
-
+# RANGER_TRINO_PLUGIN_PACKAGE_URL="https://github.com/unknowntpo/apache-ranger/releases/download/v2.4.41/${RANGER_TRINO_PLUGIN_PACKAGE_NAME}"
+RANGER_TRINO_PLUGIN_PACKAGE_URL="https://github.com/unknowntpo/apache-ranger/releases/download/ranger-trino-plugin-ranger2.4.0-trino-435/${RANGER_TRINO_PLUGIN_PACKAGE_NAME}"
 # Download MySQL jdbc driver if it does not exist.
 if [ ! -f "${trino_dir}/packages/gravitino-trino-connector/mysql-connector-java-${MYSQL_VERSION}.jar" ]; then
   cd "${trino_dir}/packages/gravitino-trino-connector/" && curl -O "${MYSQL_JAVA_CONNECTOR_URL}" && cd -
